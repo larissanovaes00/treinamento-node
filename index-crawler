@@ -1,0 +1,34 @@
+const http = require("http")
+const MercadoLivre = require("./services/MercadoLivre")
+const Cache = require("./utils/Cache")
+const Americanas = require("./services/Americanas")
+
+const app = http.createServer(async (req, res) => {
+    const term = req.url.replace("/", "")
+
+    if (term.length < 1) {
+        res.writeHead(400, { 'Content-Type': "application.json; charset-utf-8" })
+        res.write(JSON.stringify("o termo de busca não foi informado"))
+        return res.end();
+    }
+    const cachedProduts = Cache.getCache(term);
+    if (cachedProduts) {
+        res.writeHead(200, { 'Content-Typpe': 'application/json; charset=utf-8' })
+        res.write(JSON.stringify(cachedProducts))
+        return res.end()
+    }
+    const products = await Americanas.getProductsByTermAmericanas(term);
+
+    if (products.error) {
+        res.writeHead(503, { 'Content-Type': "application.json; charset-utf-8" })
+        res.write(JSON.stringify(products.details))
+        return res.end()
+    }
+
+    res.write(JSON.stringify(products))
+    res.end()
+});
+
+app.listen(3000, () => {
+    console.log("servidor rodando!")
+})
