@@ -6,7 +6,7 @@ exports.up = function (knex) {
     table.decimal('duracao').notNull()
     table.date('lancamento').notNull()
     table.date('final').notNull()
-    table.integer('fk_filme').notNull()
+    table.integer('fk_filme').notNull().unsigned()
     table.foreign('fk_filme').references('id').inTable('filmes')
   })
 };
